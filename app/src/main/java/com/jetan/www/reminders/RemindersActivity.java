@@ -23,6 +23,10 @@ public class RemindersActivity extends AppCompatActivity {
         mListView.setDivider(null);
         dbAdapter = new RemindersDbAdapter(this);
         dbAdapter.open();
+        if (savedInstanceState == null) {
+            dbAdapter.deleteAllReminders();
+            insertSomeReminders();
+        }
 
         Cursor cursor = dbAdapter.fetchAllReminders();
 
@@ -38,6 +42,14 @@ public class RemindersActivity extends AppCompatActivity {
                 0);
 
         mListView.setAdapter(cursorAdapter);
+    }
+
+    private void insertSomeReminders() {
+        for (int i = 0; i < 5; i++) {
+            dbAdapter.createReminder("Buy Learn Android Studio", true);
+            dbAdapter.createReminder("Send Dad birthday gift", false);
+            dbAdapter.createReminder("查询词典", false);
+        }
     }
 
     @Override
