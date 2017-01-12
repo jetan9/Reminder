@@ -1,5 +1,6 @@
 package com.jetan.www.reminders;
 
+import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,23 +12,32 @@ import android.widget.ListView;
 
 public class RemindersActivity extends AppCompatActivity {
     private ListView mListView;
+    private RemindersDbAdapter dbAdapter;
+    private RemindersSimpleCursorAdapter cursorAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminders);
         mListView = (ListView)findViewById(R.id.reminders_list_view);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                this,
+        mListView.setDivider(null);
+        dbAdapter = new RemindersDbAdapter(this);
+        dbAdapter.open();
+
+        Cursor cursor = dbAdapter.fetchAllReminders();
+
+        String[] from = new String[]{RemindersDbAdapter.COL_CONTENT};
+        int[] to = new int[]{R.id.row_text};
+
+        cursorAdapter = new RemindersSimpleCursorAdapter(
+                RemindersActivity.this,
                 R.layout.reminders_row,
-                R.id.row_text,
-                new String[]{
-                        "first record",
-                        "second record",
-                        "third record"
-                }
-        );
-        mListView.setAdapter(arrayAdapter);
+                cursor,
+                from,
+                to,
+                0);
+
+        mListView.setAdapter(cursorAdapter);
     }
 
     @Override
