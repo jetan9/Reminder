@@ -21,6 +21,7 @@ public class RemindersSimpleCursorAdapter extends SimpleCursorAdapter {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void bindView(View view, Context context, Cursor cursor) {
         super.bindView(view, context, cursor);
         ViewHolder holder = (ViewHolder)view.getTag();

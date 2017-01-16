@@ -4,10 +4,9 @@ import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.database.Cursor;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,12 +18,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.Checkable;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class RemindersActivity extends AppCompatActivity {
     private ListView mListView;
@@ -36,13 +33,12 @@ public class RemindersActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminders);
-        mListView = (ListView) findViewById(R.id.reminders_list_view);
+        mListView = (ListView)findViewById(R.id.reminders_list_view);
         mListView.setDivider(null);
         dbAdapter = new RemindersDbAdapter(this);
         dbAdapter.open();
         if (savedInstanceState == null) {
             dbAdapter.deleteAllReminders();
-            insertSomeReminders();
         }
 
         final Cursor cursor = dbAdapter.fetchAllReminders();
@@ -57,14 +53,14 @@ public class RemindersActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int masterListPosition, long id) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(RemindersActivity.this);
-                ListView modelListView = new ListView(RemindersActivity.this);
-                String[] models = new String[]{"Edit Reminder", "Delete Reminder"};
-                ArrayAdapter<String> modelAdapter = new ArrayAdapter<>(RemindersActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, models);
-                modelListView.setAdapter(modelAdapter);
-                builder.setView(modelListView);
+                ListView modeListView = new ListView(RemindersActivity.this);
+                String[] modes = new String[]{"Edit Reminder", "Delete Reminder"};
+                ArrayAdapter<String> modeAdapter = new ArrayAdapter<>(RemindersActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, modes);
+                modeListView.setAdapter(modeAdapter);
+                builder.setView(modeListView);
                 final Dialog dialog = builder.create();
                 dialog.show();
-                modelListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                modeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         int nId = getIdFromPosition(masterListPosition);
@@ -125,14 +121,7 @@ public class RemindersActivity extends AppCompatActivity {
         return (int)cursorAdapter.getItemId(c);
     }
 
-    private void insertSomeReminders() {
-        for (int i = 0; i < 5; i++) {
-            dbAdapter.createReminder("Buy Learn Android Studio", true);
-            dbAdapter.createReminder("Send Dad birthday gift", false);
-            dbAdapter.createReminder("查询词典", false);
-        }
-    }
-
+    @SuppressWarnings("deprecation")
     private void fireCustomDialog(final Reminder reminder) {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
