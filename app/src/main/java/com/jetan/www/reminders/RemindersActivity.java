@@ -175,6 +175,8 @@ public class RemindersActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
+
+        dialog.show();
     }
 
     @Override
