@@ -2,6 +2,7 @@ package com.jetan.www.reminders;
 
 import android.annotation.TargetApi;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class RemindersActivity extends AppCompatActivity {
     private ListView mListView;
@@ -54,7 +60,7 @@ public class RemindersActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, final int masterListPosition, long id) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(RemindersActivity.this);
                 ListView modeListView = new ListView(RemindersActivity.this);
-                String[] modes = new String[]{"Edit Reminder", "Delete Reminder"};
+                String[] modes = new String[]{"Edit Reminder", "Delete Reminder", "Schedule Reminder"};
                 ArrayAdapter<String> modeAdapter = new ArrayAdapter<>(RemindersActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, modes);
                 modeListView.setAdapter(modeAdapter);
                 builder.setView(modeListView);
@@ -67,9 +73,14 @@ public class RemindersActivity extends AppCompatActivity {
                         if (position == 0) {
                             Reminder reminder = dbAdapter.fetchReminderById(nId);
                             fireCustomDialog(reminder);
-                        } else {
+                        } else if (position == 1) {
                             dbAdapter.deleteReminderById(nId);
                             cursorAdapter.changeCursor(dbAdapter.fetchAllReminders());
+                        } else {
+                            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Shanghai"));
+                            int hour = cal.get(Calendar.HOUR_OF_DAY);
+                            int minute = cal.get(Calendar.MINUTE);
+                            new TimePickerDialog(RemindersActivity.this, null, hour, minute, true).show();
                         }
                         dialog.dismiss();
                     }
