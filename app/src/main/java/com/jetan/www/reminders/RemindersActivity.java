@@ -83,19 +83,17 @@ public class RemindersActivity extends AppCompatActivity {
                             cursorAdapter.changeCursor(dbAdapter.fetchAllReminders());
                         } else {
                             final Reminder reminder = dbAdapter.fetchReminderById(nId);
-                            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Shanghai"));
-                            final int hour = cal.get(Calendar.HOUR_OF_DAY);
-                            final int minute = cal.get(Calendar.MINUTE);
+                            Calendar today = Calendar.getInstance();
                             TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
                                 @Override
-                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Shanghai"));
-                                    cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                                    cal.set(Calendar.MINUTE, minute);
-                                    scheduleReminder(cal.getTimeInMillis(), reminder.getContent());
+                                public void onTimeSet(TimePicker view, int hour, int minute) {
+                                    Calendar alarmTime = Calendar.getInstance(TimeZone.getTimeZone("Asia/Shanghai"));
+                                    alarmTime.set(Calendar.HOUR, hour);
+                                    alarmTime.set(Calendar.MINUTE, minute);
+                                    scheduleReminder(alarmTime.getTimeInMillis(), reminder.getContent());
                                 }
                             };
-                            new TimePickerDialog(RemindersActivity.this, listener, hour, minute, true).show();
+                            new TimePickerDialog(RemindersActivity.this, listener, today.get(Calendar.HOUR), today.get(Calendar.MINUTE), false).show();
                         }
                         dialog.dismiss();
                     }
