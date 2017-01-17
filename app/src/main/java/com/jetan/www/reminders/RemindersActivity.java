@@ -1,8 +1,12 @@
 package com.jetan.www.reminders;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +27,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -77,10 +82,20 @@ public class RemindersActivity extends AppCompatActivity {
                             dbAdapter.deleteReminderById(nId);
                             cursorAdapter.changeCursor(dbAdapter.fetchAllReminders());
                         } else {
+                            final Reminder reminder = dbAdapter.fetchReminderById(nId);
                             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Shanghai"));
-                            int hour = cal.get(Calendar.HOUR_OF_DAY);
-                            int minute = cal.get(Calendar.MINUTE);
-                            new TimePickerDialog(RemindersActivity.this, null, hour, minute, true).show();
+                            final int hour = cal.get(Calendar.HOUR_OF_DAY);
+                            final int minute = cal.get(Calendar.MINUTE);
+                            TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Shanghai"));
+                                    cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                                    cal.set(Calendar.MINUTE, minute);
+                                    scheduleReminder(cal.getTimeInMillis(), reminder.getContent());
+                                }
+                            };
+                            new TimePickerDialog(RemindersActivity.this, listener, hour, minute, true).show();
                         }
                         dialog.dismiss();
                     }
@@ -126,6 +141,14 @@ public class RemindersActivity extends AppCompatActivity {
                 public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {}
             });
         }
+    }
+
+    private void scheduleReminder(long time, String content) {
+        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        Intent alarmIntent = new Intent(this, ReminderAlarmReceiver.class);
+        alarmIntent.putExtra(ReminderAlarmReceiver.REMINDER_TEXT, content);
+        PendingIntent broadcast = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, time, broadcast);
     }
 
     private int getIdFromPosition(int c) {
